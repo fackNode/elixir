@@ -7,8 +7,6 @@ scss="\e[32m"
 
 echo -e "${fmt}\nSetting up dependencies / Проверяем переменные окружения${end}" && sleep 1
 
-exit 0;
-
 if [ -z "$ADDRESS" ]; then
   echo -e "${err}\nYou have not set ADDRESS, please set the variable and try again / Вы не установили ADDRESS, пожалуйста, установите переменную и попробуйте снова${end}" && sleep 1
   exit 1;
