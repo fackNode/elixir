@@ -5,7 +5,7 @@ end="\e[0m\n"
 err="\e[31m"
 scss="\e[32m"
 
-echo -e "${fmt}\nSetting up dependencies / Проверяем переменные окружения${end}" && sleep 1
+echo -e "${fmt}\nChecking environment variables / Проверяем переменные окружения${end}" && sleep 1
 
 if [ -z "$ADDRESS" ]; then
   echo -e "${err}\nYou have not set ADDRESS, please set the variable and try again / Вы не установили ADDRESS, пожалуйста, установите переменную и попробуйте снова${end}" && sleep 1
