@@ -7,8 +7,8 @@ scss="\e[32m"
 
 echo -e "${fmt}\nChecking environment variables / Проверяем переменные окружения${end}" && sleep 1
 
-if [ -z "$ADDRESS" ]; then
-  echo -e "${err}\nYou have not set ADDRESS, please set the variable and try again / Вы не установили ADDRESS, пожалуйста, установите переменную и попробуйте снова${end}" && sleep 1
+if [ -z "$BENEFICIARY_ADDRESS" ]; then
+  echo -e "${err}\nYou have not set BENEFICIARY_ADDRESS, please set the variable and try again / Вы не установили BENEFICIARY_ADDRESS, пожалуйста, установите переменную и попробуйте снова${end}" && sleep 1
   exit 1;
 fi
 
@@ -34,29 +34,32 @@ if ! command -v docker &> /dev/null && ! command -v docker-compose &> /dev/null;
   sudo wget https://raw.githubusercontent.com/fackNode/requirements/main/docker.sh && chmod +x docker.sh && ./docker.sh
 fi
 
-echo -e "${fmt}\nCreating directory, installing Dockerfile / Создаем директорию, загружаем Dockerfile${end}" && sleep 1
+echo -e "${fmt}\nCreating directory, installing validator.env / Создаем директорию, загружаем validator.env${end}" && sleep 1
 
 mkdir elixir && cd elixir
 
-wget https://files.elixir.finance/Dockerfile
+wget https://files.elixir.finance/validator.env
 
 echo -e "${fmt}\nSeting your values in Dockerfile/ Устанавливаем ваши значения в Dockerfile${end}" && sleep 1
 
-sed -i "s/ENV ADDRESS=.*/ENV ADDRESS=$ADDRESS/" Dockerfile
-sed -i "s/ENV PRIVATE_KEY=.*/ENV PRIVATE_KEY=$PRIVATE_KEY/" Dockerfile
-sed -i "s/ENV VALIDATOR_NAME=.*/ENV VALIDATOR_NAME=$VALIDATOR_NAME/" Dockerfile
+sed -i "s/STRATEGY_EXECUTOR_IP_ADDRESS=.*/STRATEGY_EXECUTOR_IP_ADDRESS=$(curl -s eth0.me)/" validator.env
+sed -i "s/STRATEGY_EXECUTOR_DISPLAY_NAME=.*/STRATEGY_EXECUTOR_DISPLAY_NAME=$VALIDATOR_NAME/" validator.env
+sed -i "s/STRATEGY_EXECUTOR_BENEFICIARY=.*/STRATEGY_EXECUTOR_BENEFICIARY=$BENEFICIARY_ADDRESS/" validator.env
+sed -i "s/SIGNER_PRIVATE_KEY=.*/SIGNER_PRIVATE_KEY=$PRIVATE_KEY/" validator.env
 
 echo -e "${fmt}\nBuilding the Docker image / Собираем Docker образ${end}" && sleep 1
 
-docker build . -f Dockerfile -t elixir-validator
+docker pull elixirprotocol/validator:v3
 
-echo -e "${fmt}\nStarting validator / Запускаем валидатора${end}" && sleep 1
-
-docker run -d --restart unless-stopped --name ev elixir-validator
+docker run -d \
+  --env-file validator.env \
+  --name elixir \
+  --restart unless-stopped \
+  elixirprotocol/validator:v3
 
 cd $HOME
 
-if docker ps -a | grep -q 'ev'; then
+if docker ps -a | grep -q 'elixir'; then
   echo -e "${fmt}\nNode installed correctly / Нода установлена корректно${end}" && sleep 1
 else
   echo -e "${err}\nNode installed incorrectly / Нода установлена некорректно${end}" && sleep 1
@@ -65,7 +68,5 @@ fi
 
 echo -e "${scss}\n[SUCCESS] Opening validator logs, you can close logs with CTRL + C / Открываем логи валидатора, вы можете закрыть логи используя CTRL + C${end}" && sleep 3
 
-# rm elixir.sh
-
-docker logs ev -f
+docker logs elixir -f
 
