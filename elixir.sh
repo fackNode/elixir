@@ -31,7 +31,7 @@ sudo apt update
 sudo apt install curl ca-certificates curl gnupg lsb-release jq -y < "/dev/null"
                 
 if ! command -v docker &> /dev/null && ! command -v docker-compose &> /dev/null; then
-  sudo wget https://raw.githubusercontent.com/fackNode/requirements/main/docker.sh && chmod +x docker.sh && ./docker.sh
+  sudo wget https://raw.githubusercontent.com/fackNode/requirements/main/docker.sh && sudo chmod +x docker.sh && ./docker.sh
 fi
 
 echo -e "${fmt}\nCreating directory, installing validator.env / Создаем директорию, загружаем validator.env${end}" && sleep 1
