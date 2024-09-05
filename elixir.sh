@@ -40,9 +40,9 @@ mkdir elixir && cd elixir
 
 wget https://files.elixir.finance/validator.env
 
-echo -e "${fmt}\nSeting your values in Dockerfile/ Устанавливаем ваши значения в Dockerfile${end}" && sleep 1
+echo -e "${fmt}\nSeting your values in validator.env/ Устанавливаем ваши значения в validator.env${end}" && sleep 1
 
-sed -i "s/STRATEGY_EXECUTOR_IP_ADDRESS=.*/STRATEGY_EXECUTOR_IP_ADDRESS=$(curl -s eth0.me)/" validator.env
+# sed -i "s/STRATEGY_EXECUTOR_IP_ADDRESS=.*/STRATEGY_EXECUTOR_IP_ADDRESS=$(curl -s eth0.me)/" validator.env
 sed -i "s/STRATEGY_EXECUTOR_DISPLAY_NAME=.*/STRATEGY_EXECUTOR_DISPLAY_NAME=$VALIDATOR_NAME/" validator.env
 sed -i "s/STRATEGY_EXECUTOR_BENEFICIARY=.*/STRATEGY_EXECUTOR_BENEFICIARY=$BENEFICIARY_ADDRESS/" validator.env
 sed -i "s/SIGNER_PRIVATE_KEY=.*/SIGNER_PRIVATE_KEY=$PRIVATE_KEY/" validator.env
@@ -52,9 +52,9 @@ echo -e "${fmt}\nBuilding the Docker image / Собираем Docker образ$
 docker pull elixirprotocol/validator:v3
 
 docker run -d \
-  --env-file validator.env \
+  --env-file $HOME/elixir/validator.env \
   --name elixir \
-  --restart unless-stopped \
+  --restart always \
   elixirprotocol/validator:v3
 
 cd $HOME
@@ -69,4 +69,3 @@ fi
 echo -e "${scss}\n[SUCCESS] Opening validator logs, you can close logs with CTRL + C / Открываем логи валидатора, вы можете закрыть логи используя CTRL + C${end}" && sleep 3
 
 docker logs elixir -f
-
